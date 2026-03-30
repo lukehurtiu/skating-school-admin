@@ -21,6 +21,21 @@ Local skating schools struggle with paper-based tracking of attendance, student 
 - [Tailwind CSS](https://tailwindcss.com/) — Styling
 - [TypeScript](https://www.typescriptlang.org/) — Type safety
 
+## 📦 Project Status
+
+| Area | Status |
+|---|---|
+| Project scaffold & config | ✅ Done |
+| TypeScript domain types | ✅ Done |
+| Supabase browser + server clients | ✅ Done |
+| Session refresh middleware | ✅ Done |
+| Database schema & RLS | 🔲 Next |
+| Auth (login, role-based access) | 🔲 Upcoming |
+| Class management UI | 🔲 Upcoming |
+| Student management UI | 🔲 Upcoming |
+| Attendance tracking UI | 🔲 Upcoming |
+| Skill feedback UI | 🔲 Upcoming |
+
 ## 🚀 Getting Started
 
 ### 1. Clone the repo
@@ -38,11 +53,7 @@ npm install
 
 ### 3. Set up environment variables
 
-```bash
-cp .env.local.example .env.local
-```
-
-Fill in your Supabase project URL and anon key from your [Supabase dashboard](https://app.supabase.com).
+Create `.env.local` and fill in your Supabase project credentials from your [Supabase dashboard](https://app.supabase.com):
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
@@ -59,7 +70,7 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ## 🗃️ Database Schema
 
-See `supabase/schema.sql` for the full schema. Tables:
+Tables:
 
 - `profiles` — Users (admins, instructors)
 - `classes` — Skating class sessions
