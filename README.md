@@ -31,8 +31,8 @@ Local skating schools struggle with paper-based tracking of attendance, student 
 | Session refresh middleware | ✅ Done |
 | Database schema & RLS | ✅ Done |
 | Auth (login, route protection, sign out) | ✅ Done |
-| Class management UI | 🔲 Next |
-| Student management UI | 🔲 Upcoming |
+| Class management UI | ✅ Done |
+| Student management UI | 🔲 Next |
 | Attendance tracking UI | 🔲 Upcoming |
 | Skill feedback UI | 🔲 Upcoming |
 
