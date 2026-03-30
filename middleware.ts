@@ -1,6 +1,8 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const publicPaths = ["/login", "/auth/callback"];
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -29,8 +31,27 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Refresh the session so it doesn't expire
-  await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+  const isPublic = publicPaths.some((p) => pathname.startsWith(p));
+
+  const redirect = (destination: string) => {
+    const url = request.nextUrl.clone();
+    url.pathname = destination;
+    const res = NextResponse.redirect(url);
+    // Propagate session cookies onto the redirect response
+    supabaseResponse.cookies.getAll().forEach((c) => res.cookies.set(c.name, c.value));
+    return res;
+  };
+
+  if (!user && !isPublic) {
+    return redirect("/login");
+  }
+
+  if (user && pathname === "/login") {
+    return redirect("/dashboard");
+  }
 
   return supabaseResponse;
 }
