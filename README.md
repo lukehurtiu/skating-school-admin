@@ -29,9 +29,9 @@ Local skating schools struggle with paper-based tracking of attendance, student 
 | TypeScript domain types | ✅ Done |
 | Supabase browser + server clients | ✅ Done |
 | Session refresh middleware | ✅ Done |
-| Database schema & RLS | 🔲 Next |
-| Auth (login, role-based access) | 🔲 Upcoming |
-| Class management UI | 🔲 Upcoming |
+| Database schema & RLS | ✅ Done |
+| Auth (login, route protection, sign out) | ✅ Done |
+| Class management UI | 🔲 Next |
 | Student management UI | 🔲 Upcoming |
 | Attendance tracking UI | 🔲 Upcoming |
 | Skill feedback UI | 🔲 Upcoming |
