@@ -1,64 +1,77 @@
-# ⛸️ Skating School Admin
+# Skating School Admin
 
-A web application to help local skating schools move away from paper tracking and manage their daily operations digitally.
+A role-based management platform for ice/figure skating schools. Admins manage class schedules and student rosters; instructors track attendance and log skill assessments — replacing paper-based workflows.
 
-## 🎯 Problem
+## Tech Stack
 
-Local skating schools struggle with paper-based tracking of attendance, student skill progression, and class management — leading to lost records and slow feedback loops for parents and instructors.
-
-## ✅ MVP Features
-
-- **Auth** — Secure login for admins and instructors (Supabase Auth)
-- **Class Management** — Create and view classes with time, day, ice location, and level
-- **Student Management** — Add students and assign them to classes
-- **Attendance Tracking** — Mark students present or absent per session
-- **Skill Feedback** — Instructors mark pass/not-pass per skill at end of session
-
-## 🛠️ Tech Stack
-
-- [Next.js 14](https://nextjs.org/) — Fullstack React framework
-- [Supabase](https://supabase.com/) — Database, Auth, and API
-- [Tailwind CSS](https://tailwindcss.com/) — Styling
-- [TypeScript](https://www.typescriptlang.org/) — Type safety
-
-## 📦 Project Status
-
-| Area | Status |
+| Layer | Technology |
 |---|---|
-| Project scaffold & config | ✅ Done |
-| TypeScript domain types | ✅ Done |
-| Supabase browser + server clients | ✅ Done |
-| Session refresh middleware | ✅ Done |
-| Database schema & RLS | ✅ Done |
-| Auth (login, route protection, sign out) | ✅ Done |
-| Class management UI | ✅ Done |
-| Student management UI | 🔲 Next |
-| Attendance tracking UI | 🔲 Upcoming |
-| Skill feedback UI | 🔲 Upcoming |
+| Frontend | Next.js 14 (App Router, TypeScript) |
+| Database & Auth | Supabase (PostgreSQL + RLS + Auth) |
+| Styling | Tailwind CSS |
+| Deployment | Vercel |
 
-## 🚀 Getting Started
+## Project Status
 
-### 1. Clone the repo
+### Phase 1 — Complete
+| Feature | Status |
+|---|---|
+| Project scaffold, TypeScript types, config | Done |
+| Supabase browser + server clients | Done |
+| Session refresh middleware | Done |
+| Database schema (7 tables) + RLS policies | Done |
+| Auth — login, route protection, sign-out | Done |
+| Class management — list, create, detail | Done |
+
+### Phase 2 — In Progress
+| Feature | Status |
+|---|---|
+| Student management (list, create) | Upcoming |
+| Enrollment management | Upcoming |
+| Attendance tracking UI | Upcoming |
+| Skill assessment UI | Upcoming |
+| Role-based dashboard | Upcoming |
+| Unit testing | Upcoming |
+| Security audit | Upcoming |
+
+## Database Schema
+
+| Table | Purpose |
+|---|---|
+| `profiles` | Users (admin / instructor), auto-created on signup |
+| `classes` | Skating class sessions with schedule and level |
+| `students` | Student records |
+| `enrollments` | Student ↔ class assignments |
+| `attendance` | Per-session present/absent records |
+| `skills` | Skills list per level |
+| `skill_assessments` | Instructor pass/not-pass per student per skill |
+
+Row Level Security is enabled on all tables. Instructors can only write data for their own classes.
+
+## Getting Started
+
+### 1. Clone and install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/skating-school-admin.git
+git clone https://github.com/[your-username]/skating-school-admin.git
 cd skating-school-admin
-```
-
-### 2. Install dependencies
-
-```bash
 npm install
 ```
 
-### 3. Set up environment variables
+### 2. Environment variables
 
-Create `.env.local` and fill in your Supabase project credentials from your [Supabase dashboard](https://app.supabase.com):
+Create `.env.local`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
+
+Never commit `.env.local` — it is in `.gitignore`.
+
+### 3. Database
+
+Run `supabase/schema.sql` in your Supabase project's SQL editor to create all tables, RLS policies, and the profile auto-creation trigger.
 
 ### 4. Run locally
 
@@ -68,33 +81,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-## 🗃️ Database Schema
+## Security
 
-Tables:
+- `.env.local` excluded via `.gitignore`
+- Only `NEXT_PUBLIC_` prefixed Supabase keys used client-side (anon key — safe to expose)
+- Service role key never referenced in codebase
+- All mutations enforce RLS at the database level
+- Supabase JS SDK used throughout — no raw SQL constructed from user input
 
-- `profiles` — Users (admins, instructors)
-- `classes` — Skating class sessions
-- `students` — Student records
-- `enrollments` — Student ↔ class assignments
-- `attendance` — Per-session attendance records
-- `skills` — Skills per level
-- `skill_assessments` — Instructor feedback per student per skill
+## Deployment
 
-## 🌐 Deployment
-
-Deployed on [Vercel](https://vercel.com). Add your environment variables in the Vercel project settings.
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
-
-## 📋 Assumptions to Validate
-
-- Instructors will adopt a tablet/phone workflow during sessions
-- Admins manage student registration (no self-signup for parents in MVP)
-- One primary instructor per class is sufficient for MVP
-
-## 🧪 How to Give Feedback
-
-After testing, please note:
-- Any flows that felt confusing or slow
-- Missing information you'd expect to see
-- Anything that broke
+Deployed on Vercel. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel project settings.

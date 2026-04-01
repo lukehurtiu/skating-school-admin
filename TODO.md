@@ -1,51 +1,80 @@
 # Skating School Admin — Project Tasks
 
-## 🏗️ Setup
+## Phase 1 — Complete
+
+### Setup & Infrastructure
 - [x] Initialize project structure
 - [x] Create README.md
 - [x] Set up package.json with dependencies
-- [x] Set up Supabase client (browser + server)
-- [x] Define TypeScript types
-- [ ] Run `npm install`
-- [ ] Set up `.env.local` with Supabase keys
-- [ ] Set up Next.js config + Tailwind
+- [x] Set up `.env.local` with Supabase keys
+- [x] Set up Next.js config + Tailwind CSS
 
-## 🗃️ Database (Supabase)
-- [ ] Create `profiles` table
-- [ ] Create `classes` table
-- [ ] Create `students` table
-- [ ] Create `enrollments` table
-- [ ] Create `attendance` table
-- [ ] Create `skills` table
-- [ ] Create `skill_assessments` table
-- [ ] Set up Row Level Security (RLS) policies
+### Supabase / Database
+- [x] Create `profiles` table (with auto-creation trigger on signup)
+- [x] Create `classes` table
+- [x] Create `students` table
+- [x] Create `enrollments` table
+- [x] Create `attendance` table
+- [x] Create `skills` table
+- [x] Create `skill_assessments` table
+- [x] Set up Row Level Security (RLS) policies for all tables
 
-## 🔐 Auth
-- [ ] Login page
-- [ ] Middleware for protected routes
-- [ ] Role-based access (admin vs instructor)
+### Auth
+- [x] Login page
+- [x] Middleware for protected routes
+- [x] Sign-out
+- [x] Role-based access (admin vs instructor) via RLS
 
-## 📋 Classes
-- [ ] Class list page
-- [ ] Create class form
-- [ ] Class detail view
+### Class Management
+- [x] Class list page (`/classes`)
+- [x] Create class form (`/classes/new`) — admin only
+- [x] Class detail view (`/classes/[id]`)
 
-## 👦 Students
-- [ ] Student list page
-- [ ] Add student form
-- [ ] Assign student to class
+---
 
-## ✅ Attendance
-- [ ] Attendance page per class/session
-- [ ] Mark present/absent
-- [ ] View past sessions
+## Phase 2 — Upcoming
 
-## ⭐ Skill Feedback
-- [ ] Skills list per level
-- [ ] Mark pass/not-pass per student per skill
-- [ ] Session summary view
+### Student Management
+- [ ] Student list page (`/students`)
+- [ ] Add student form (`/students/new`) — admin only
 
-## 🚀 Deployment
-- [ ] Deploy to Vercel
-- [ ] Add env vars to Vercel
-- [ ] Test production build
+### Enrollment Management
+- [ ] Show enrolled students on class detail page
+- [ ] Enroll student into class — admin only
+
+### Attendance Tracking
+- [ ] Attendance sheet per class (`/classes/[id]/attendance`)
+- [ ] Mark present / absent per student per session (instructor)
+
+### Skill Feedback
+- [ ] Student skills page (`/students/[id]/skills`)
+- [ ] Mark skill passed / not passed (instructor)
+
+### Dashboard
+- [ ] Instructor dashboard — show assigned classes only
+- [ ] Admin dashboard — show aggregate counts
+
+### Role Guards
+- [ ] Server-side role check on all write actions
+- [ ] Hide admin-only UI elements from instructor role
+
+### Testing
+- [ ] Set up Jest + ts-jest
+- [ ] Unit test: schedule formatting helper
+- [ ] Unit test: admin role-check utility
+
+### Security Audit
+- [ ] Run AI security audit (server actions, RLS, middleware)
+- [ ] Document findings and fixes
+
+---
+
+## Phase 3 — Group Integration (upcoming)
+
+- [ ] Sync with group project
+- [ ] Integration endpoints / shared schema
+
+## Phase 4 — Final Documentation
+
+- [ ] Personal documentation
+- [ ] Group documentation
