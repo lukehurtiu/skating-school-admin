@@ -39,3 +39,36 @@ export async function createClass(formData: FormData) {
 
   redirect("/classes");
 }
+
+export async function enrollStudent(formData: FormData) {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin") return { error: "Unauthorized" };
+
+  const student_id = formData.get("student_id") as string;
+  const class_id = formData.get("class_id") as string;
+
+  if (!student_id || !class_id) return { error: "Missing student or class" };
+
+  const { error } = await supabase
+    .from("enrollments")
+    .insert({ student_id, class_id });
+
+  if (error) {
+    if (error.code === "23505") return { error: "Student already enrolled" };
+    return { error: error.message };
+  }
+
+  redirect(`/classes/${class_id}`);
+}
