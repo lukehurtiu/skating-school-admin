@@ -1,12 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
-import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Student, SkatingLevel, Skill, SkillAssessment, AssessmentStatus, AttendanceRecord } from "@/lib/types";
 
 type StudentWithLevel = Student & { skating_levels: { name: string } | null };
 type LevelWithSkills = SkatingLevel & { skills: Skill[] };
 
-export default async function GuardianStudentPage({ params }: { params: { id: string } }) {
+export default async function MyProgressPage() {
   const supabase = createClient();
 
   const {
@@ -19,27 +18,44 @@ export default async function GuardianStudentPage({ params }: { params: { id: st
     .eq("id", user!.id)
     .single();
 
-  if (profile?.role !== "guardian" && profile?.role !== "admin") {
+  if (profile?.role !== "student" && profile?.role !== "admin") {
     redirect("/dashboard");
   }
 
-  // Guardians can only view their linked students
-  if (profile?.role === "guardian") {
-    const { data: link } = await supabase
-      .from("guardian_students")
-      .select("id")
-      .eq("guardian_id", user!.id)
-      .eq("student_id", params.id)
-      .maybeSingle();
-    if (!link) redirect("/my-students");
+  // Find the student record linked to this account
+  const { data: link } = await supabase
+    .from("student_links")
+    .select("student_id")
+    .eq("profile_id", user!.id)
+    .maybeSingle();
+
+  if (!link) {
+    return (
+      <div>
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">My Progress</h1>
+            <p className="page-subtitle">Your skating skills and attendance.</p>
+          </div>
+        </div>
+        <div className="mt-12 text-center">
+          <p className="text-sm font-medium text-slate-900">Account not linked yet</p>
+          <p className="mt-1 text-sm text-slate-500">
+            An admin will link your account to your student profile.
+          </p>
+        </div>
+      </div>
+    );
   }
+
+  const studentId = link.student_id;
 
   const [{ data: student }, { data: levels }, { data: assessments }, { data: attendance }] =
     await Promise.all([
       supabase
         .from("students")
         .select("*, skating_levels(name)")
-        .eq("id", params.id)
+        .eq("id", studentId)
         .single<StudentWithLevel>(),
       supabase
         .from("skating_levels")
@@ -49,19 +65,19 @@ export default async function GuardianStudentPage({ params }: { params: { id: st
       supabase
         .from("skill_assessments")
         .select("*")
-        .eq("student_id", params.id)
+        .eq("student_id", studentId)
         .order("assessed_at", { ascending: false })
         .returns<SkillAssessment[]>(),
       supabase
         .from("attendance")
         .select("date, status")
-        .eq("student_id", params.id)
+        .eq("student_id", studentId)
         .order("date", { ascending: false })
         .limit(20)
         .returns<Pick<AttendanceRecord, "date" | "status">[]>(),
     ]);
 
-  if (!student) notFound();
+  if (!student) redirect("/my-progress");
 
   const latestBySkill = new Map<string, SkillAssessment>();
   for (const a of assessments ?? []) {
@@ -79,13 +95,13 @@ export default async function GuardianStudentPage({ params }: { params: { id: st
 
   return (
     <div>
-      <Link href="/my-students" className="back-link">← Back to my students</Link>
-
-      <div className="mt-4">
-        <h1 className="page-title">{student.first_name} {student.last_name}</h1>
-        <p className="page-subtitle">
-          {student.skating_levels?.name ?? "No level set"} · {passedCount} / {totalSkills} skills passed
-        </p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">{student.first_name} {student.last_name}</h1>
+          <p className="page-subtitle">
+            {student.skating_levels?.name ?? "No level set"} · {passedCount} / {totalSkills} skills passed
+          </p>
+        </div>
       </div>
 
       {/* Recent attendance */}

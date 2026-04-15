@@ -28,9 +28,9 @@ export default function LoginPage() {
       <div className="mt-8 w-full max-w-sm">
         <LoginForm />
         <p className="mt-4 text-center text-xs text-slate-400">
-          Are you a parent?{" "}
+          Are you a student?{" "}
           <Link href="/signup" className="font-medium text-slate-600 hover:text-slate-900 transition-colors">
-            Create a parent account
+            Create a student account
           </Link>
         </p>
       </div>

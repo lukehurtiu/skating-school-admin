@@ -14,7 +14,7 @@ create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
   full_name text not null,
-  role text not null check (role in ('admin', 'instructor', 'guardian')),
+  role text not null check (role in ('admin', 'instructor', 'student')),
   created_at timestamptz not null default now()
 );
 
@@ -48,7 +48,7 @@ begin
     new.email,
     coalesce(new.raw_user_meta_data->>'full_name', ''),
     case
-      when new.raw_user_meta_data->>'role' = 'guardian' then 'guardian'
+      when new.raw_user_meta_data->>'role' = 'student' then 'student'
       else 'instructor'  -- default; admins must be promoted manually
     end
   );
@@ -153,23 +153,23 @@ create policy "students: admin full write" on students
   );
 
 -- ============================================================
--- GUARDIAN STUDENTS
--- Links guardian accounts to the students they can view.
+-- STUDENT LINKS
+-- Links a student login account (profile) to their student record.
 -- ============================================================
-create table guardian_students (
+create table student_links (
   id           uuid primary key default gen_random_uuid(),
-  guardian_id  uuid not null references profiles(id) on delete cascade,
+  profile_id   uuid not null references profiles(id) on delete cascade,
   student_id   uuid not null references students(id) on delete cascade,
   created_at   timestamptz not null default now(),
-  unique (guardian_id, student_id)
+  unique (profile_id, student_id)
 );
 
-alter table guardian_students enable row level security;
+alter table student_links enable row level security;
 
-create policy "guardian_students: guardian read own" on guardian_students
-  for select using (guardian_id = auth.uid());
+create policy "student_links: student read own" on student_links
+  for select using (profile_id = auth.uid());
 
-create policy "guardian_students: admin full write" on guardian_students
+create policy "student_links: admin full write" on student_links
   for all using (
     exists (select 1 from profiles p where p.id = auth.uid() and p.role = 'admin')
   );

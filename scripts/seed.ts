@@ -37,9 +37,9 @@ const SEED_USERS = [
   { email: "instructor1@skatingschool.com", password: "Password123!", full_name: "Emily Chen",       role: "instructor" as const },
   { email: "instructor2@skatingschool.com", password: "Password123!", full_name: "James Kowalski",   role: "instructor" as const },
   { email: "instructor3@skatingschool.com", password: "Password123!", full_name: "Maria Santos",     role: "instructor" as const },
-  { email: "parent1@skatingschool.com",     password: "Password123!", full_name: "Jennifer Thompson",role: "guardian"   as const },
-  { email: "parent2@skatingschool.com",     password: "Password123!", full_name: "Carlos Garcia",    role: "guardian"   as const },
-  { email: "parent3@skatingschool.com",     password: "Password123!", full_name: "Robert Brown",     role: "guardian"   as const },
+  { email: "student1@skatingschool.com",    password: "Password123!", full_name: "Lily Thompson",   role: "student"   as const },
+  { email: "student2@skatingschool.com",    password: "Password123!", full_name: "Noah Garcia",      role: "student"   as const },
+  { email: "student3@skatingschool.com",    password: "Password123!", full_name: "Aiden Brown",      role: "student"   as const },
 ];
 
 const SEED_STUDENTS = [
@@ -80,7 +80,7 @@ async function createUsers(): Promise<Map<string, string>> {
       const { data: updated, error: updateErr } = await supabase.auth.admin.updateUserById(match.id, {
         password: u.password,
         email_confirm: true,
-        user_metadata: { full_name: u.full_name },
+        user_metadata: { full_name: u.full_name, role: u.role },
       });
       if (updateErr || !updated.user) abort(`Failed to update user ${u.email}`, updateErr);
       emailToId.set(u.email, updated.user.id);
@@ -92,7 +92,7 @@ async function createUsers(): Promise<Map<string, string>> {
       email: u.email,
       password: u.password,
       email_confirm: true,
-      user_metadata: { full_name: u.full_name },
+      user_metadata: { full_name: u.full_name, role: u.role },
     });
     if (error || !data.user) abort(`Failed to create user ${u.email}`, error);
 
@@ -362,30 +362,30 @@ async function seedAssessments(
   log(`created ${assessments.length} skill assessments`);
 }
 
-async function seedGuardianLinks(emailToId: Map<string, string>, studentIds: string[]) {
-  console.log("\n8. Linking guardians to students…");
+async function seedStudentLinks(emailToId: Map<string, string>, studentIds: string[]) {
+  console.log("\n8. Linking student accounts to student records…");
 
-  // parent1 → Lily Thompson (index 0)
-  // parent2 → Noah Garcia  (index 1)
-  // parent3 → Aiden Brown  (index 3)
+  // student1 → Lily Thompson (index 0)
+  // student2 → Noah Garcia   (index 1)
+  // student3 → Aiden Brown   (index 3)
   const links = [
-    { guardian_id: emailToId.get("parent1@skatingschool.com")!, student_id: studentIds[0] },
-    { guardian_id: emailToId.get("parent2@skatingschool.com")!, student_id: studentIds[1] },
-    { guardian_id: emailToId.get("parent3@skatingschool.com")!, student_id: studentIds[3] },
+    { profile_id: emailToId.get("student1@skatingschool.com")!, student_id: studentIds[0] },
+    { profile_id: emailToId.get("student2@skatingschool.com")!, student_id: studentIds[1] },
+    { profile_id: emailToId.get("student3@skatingschool.com")!, student_id: studentIds[3] },
   ];
 
-  // Clear existing links for these guardians
+  // Clear existing links for these profiles
   await supabase
-    .from("guardian_students")
+    .from("student_links")
     .delete()
-    .in("guardian_id", links.map((l) => l.guardian_id));
+    .in("profile_id", links.map((l) => l.profile_id));
 
-  const { error } = await supabase.from("guardian_students").insert(links);
-  if (error) abort("Failed to insert guardian links", error);
+  const { error } = await supabase.from("student_links").insert(links);
+  if (error) abort("Failed to insert student links", error);
 
-  log(`linked parent1@skatingschool.com → Lily Thompson`);
-  log(`linked parent2@skatingschool.com → Noah Garcia`);
-  log(`linked parent3@skatingschool.com → Aiden Brown`);
+  log(`linked student1@skatingschool.com → Lily Thompson`);
+  log(`linked student2@skatingschool.com → Noah Garcia`);
+  log(`linked student3@skatingschool.com → Aiden Brown`);
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -400,7 +400,7 @@ async function main() {
   const enrollments = await seedEnrollments(classIds, studentIds);
   await seedAttendance(classIds, studentIds, enrollments);
   await seedAssessments(classIds, studentIds, emailToId);
-  await seedGuardianLinks(emailToId, studentIds);
+  await seedStudentLinks(emailToId, studentIds);
 
   console.log("\n✓ Done! Seed accounts:");
   console.log("  admin@skatingschool.com       / Password123!  (admin)");
@@ -408,9 +408,9 @@ async function main() {
   console.log("  instructor1@skatingschool.com / Password123!  (instructor — Emily Chen)");
   console.log("  instructor2@skatingschool.com / Password123!  (instructor — James Kowalski)");
   console.log("  instructor3@skatingschool.com / Password123!  (instructor — Maria Santos)");
-  console.log("  parent1@skatingschool.com     / Password123!  (guardian — Jennifer Thompson → Lily)");
-  console.log("  parent2@skatingschool.com     / Password123!  (guardian — Carlos Garcia → Noah)");
-  console.log("  parent3@skatingschool.com     / Password123!  (guardian — Robert Brown → Aiden)");
+  console.log("  student1@skatingschool.com    / Password123!  (student — Lily Thompson)");
+  console.log("  student2@skatingschool.com    / Password123!  (student — Noah Garcia)");
+  console.log("  student3@skatingschool.com    / Password123!  (student — Aiden Brown)");
 }
 
 main();

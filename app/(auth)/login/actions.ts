@@ -20,8 +20,8 @@ export async function signIn(formData: FormData) {
     .eq("id", data.user.id)
     .single();
 
-  if (profile?.role === "guardian") {
-    redirect("/my-students");
+  if (profile?.role === "student") {
+    redirect("/my-progress");
   }
 
   redirect("/dashboard");

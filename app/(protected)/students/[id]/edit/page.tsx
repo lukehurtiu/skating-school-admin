@@ -1,12 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { Student, SkatingLevel, GuardianStudent, Profile } from "@/lib/types";
+import { Student, SkatingLevel, StudentLink, Profile } from "@/lib/types";
 import EditStudentForm from "./EditStudentForm";
 import DeleteStudentButton from "../DeleteStudentButton";
-import GuardianManager from "./GuardianManager";
+import StudentAccountManager from "./StudentAccountManager";
 
-type GuardianRow = GuardianStudent & {
+type LinkRow = StudentLink & {
   profiles: Pick<Profile, "full_name" | "email"> | null;
 };
 
@@ -25,7 +25,7 @@ export default async function EditStudentPage({ params }: { params: { id: string
 
   if (profile?.role !== "admin") redirect(`/students/${params.id}/skills`);
 
-  const [{ data: student }, { data: levels }, { data: guardians }] = await Promise.all([
+  const [{ data: student }, { data: levels }, { data: links }] = await Promise.all([
     supabase.from("students").select("*").eq("id", params.id).single<Student>(),
     supabase
       .from("skating_levels")
@@ -33,10 +33,10 @@ export default async function EditStudentPage({ params }: { params: { id: string
       .order("sort_order")
       .returns<SkatingLevel[]>(),
     supabase
-      .from("guardian_students")
-      .select("id, guardian_id, student_id, profiles(full_name, email)")
+      .from("student_links")
+      .select("id, profile_id, student_id, profiles(full_name, email)")
       .eq("student_id", params.id)
-      .returns<GuardianRow[]>(),
+      .returns<LinkRow[]>(),
   ]);
 
   if (!student) notFound();
@@ -49,11 +49,11 @@ export default async function EditStudentPage({ params }: { params: { id: string
       <EditStudentForm student={student} levels={levels ?? []} />
 
       <div className="mt-10 border-t border-slate-200 pt-6">
-        <h2 className="text-sm font-semibold text-slate-900">Linked guardians</h2>
+        <h2 className="text-sm font-semibold text-slate-900">Linked student account</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Guardians can view this student&apos;s attendance and skill progress.
+          Link a student&apos;s login account so they can view their own progress.
         </p>
-        <GuardianManager studentId={params.id} guardians={guardians ?? []} />
+        <StudentAccountManager studentId={params.id} links={links ?? []} />
       </div>
 
       <div className="mt-10 border-t border-slate-200 pt-6">

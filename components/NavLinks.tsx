@@ -10,13 +10,13 @@ const staffLinks = [
   { href: "/skills", label: "Skills" },
 ];
 
-const guardianLinks = [
-  { href: "/my-students", label: "My Students" },
+const studentLinks = [
+  { href: "/my-progress", label: "My Progress" },
 ];
 
 export default function NavLinks({ role }: { role: string }) {
   const pathname = usePathname();
-  const links = role === "guardian" ? guardianLinks : staffLinks;
+  const links = role === "student" ? studentLinks : staffLinks;
 
   return (
     <nav className="flex items-center gap-6">

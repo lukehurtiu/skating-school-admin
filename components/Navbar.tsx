@@ -27,7 +27,7 @@ export default async function Navbar() {
               <span className="text-sm text-slate-600">{profile.full_name}</span>
               <span className={
                 profile.role === "admin" ? "badge-admin" :
-                profile.role === "guardian" ? "badge-indigo" :
+                profile.role === "student" ? "badge-indigo" :
                 "badge-instructor"
               }>
                 {profile.role}

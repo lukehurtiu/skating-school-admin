@@ -132,7 +132,7 @@ export async function deleteStudent(formData: FormData) {
   redirect("/students?success=1");
 }
 
-export async function linkGuardian(formData: FormData) {
+export async function linkStudent(formData: FormData) {
   const supabase = createClient();
 
   const {
@@ -149,30 +149,30 @@ export async function linkGuardian(formData: FormData) {
   if (profile?.role !== "admin") return { error: "Unauthorized" };
 
   const student_id = formData.get("student_id") as string;
-  const guardian_email = (formData.get("guardian_email") as string)?.trim().toLowerCase();
+  const student_email = (formData.get("student_email") as string)?.trim().toLowerCase();
 
-  if (!student_id || !guardian_email) return { error: "All fields are required" };
+  if (!student_id || !student_email) return { error: "All fields are required" };
 
-  const { data: guardian } = await supabase
+  const { data: studentProfile } = await supabase
     .from("profiles")
     .select("id, role")
-    .eq("email", guardian_email)
+    .eq("email", student_email)
     .maybeSingle();
 
-  if (!guardian) return { error: "No account found with that email" };
-  if (guardian.role !== "guardian") return { error: "That account is not a guardian account" };
+  if (!studentProfile) return { error: "No account found with that email" };
+  if (studentProfile.role !== "student") return { error: "That account is not a student account" };
 
   const { error } = await supabase
-    .from("guardian_students")
-    .insert({ guardian_id: guardian.id, student_id });
+    .from("student_links")
+    .insert({ profile_id: studentProfile.id, student_id });
 
-  if (error?.code === "23505") return { error: "Guardian is already linked to this student" };
-  if (error) return { error: "Failed to link guardian" };
+  if (error?.code === "23505") return { error: "Student is already linked to this profile" };
+  if (error) return { error: "Failed to link student account" };
 
   revalidatePath(`/students/${student_id}/edit`);
 }
 
-export async function unlinkGuardian(formData: FormData) {
+export async function unlinkStudent(formData: FormData) {
   const supabase = createClient();
 
   const {
@@ -188,16 +188,16 @@ export async function unlinkGuardian(formData: FormData) {
 
   if (profile?.role !== "admin") return { error: "Unauthorized" };
 
-  const guardian_student_id = formData.get("guardian_student_id") as string;
+  const link_id = formData.get("link_id") as string;
   const student_id = formData.get("student_id") as string;
-  if (!guardian_student_id) return { error: "Missing link ID" };
+  if (!link_id) return { error: "Missing link ID" };
 
   const { error } = await supabase
-    .from("guardian_students")
+    .from("student_links")
     .delete()
-    .eq("id", guardian_student_id);
+    .eq("id", link_id);
 
-  if (error) return { error: "Failed to unlink guardian" };
+  if (error) return { error: "Failed to unlink student account" };
 
   revalidatePath(`/students/${student_id}/edit`);
 }

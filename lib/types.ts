@@ -1,4 +1,4 @@
-export type Role = "admin" | "instructor" | "guardian";
+export type Role = "admin" | "instructor" | "student";
 
 export interface Profile {
   id: string;
@@ -46,9 +46,9 @@ export interface Student {
   skating_levels?: Pick<SkatingLevel, "id" | "name">;
 }
 
-export interface GuardianStudent {
+export interface StudentLink {
   id: string;
-  guardian_id: string;
+  profile_id: string;
   student_id: string;
   created_at: string;
   profiles?: Pick<Profile, "full_name" | "email">;

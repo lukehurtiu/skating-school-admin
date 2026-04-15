@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { guardianSignUp } from "./actions";
+import { studentSignUp } from "./actions";
 
 const inputClass =
   "mt-1 block w-full rounded border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-300 transition-colors focus:border-slate-400 focus:outline-none";
 const labelClass = "block text-[11px] font-semibold uppercase tracking-wide text-slate-400";
 
-export default function GuardianSignUpForm() {
+export default function StudentSignUpForm() {
   const [error, setError] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -17,7 +17,7 @@ export default function GuardianSignUpForm() {
     setError(null);
     const formData = new FormData(e.currentTarget);
     startTransition(async () => {
-      const result = await guardianSignUp(formData);
+      const result = await studentSignUp(formData);
       if (result?.error) setError(result.error);
       else if (result?.needsConfirmation) setConfirmed(true);
     });
@@ -30,7 +30,7 @@ export default function GuardianSignUpForm() {
         <h2 className="mt-2 text-base font-semibold text-slate-900">Check your email</h2>
         <p className="mt-2 text-sm leading-relaxed text-slate-500">
           We sent a confirmation link to your address. Click it to activate your account, then sign in.
-          An admin will link your account to your child&apos;s profile.
+          An admin will link your account to your student profile.
         </p>
       </div>
     );
@@ -38,9 +38,9 @@ export default function GuardianSignUpForm() {
 
   return (
     <div className="w-full rounded-lg border border-slate-200 bg-white p-8">
-      <h1 className="text-[15px] font-semibold text-slate-900">Create a parent account</h1>
+      <h1 className="text-[15px] font-semibold text-slate-900">Create a student account</h1>
       <p className="mt-1 text-[13px] text-slate-400">
-        Track your child&apos;s progress and attendance.
+        Track your skating progress and attendance.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
