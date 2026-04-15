@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const publicPaths = ["/login", "/auth/callback"];
+const publicPaths = ["/login", "/signup", "/auth/callback"];
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -49,7 +49,7 @@ export async function middleware(request: NextRequest) {
     return redirect("/login");
   }
 
-  if (user && pathname === "/login") {
+  if (user && (pathname === "/login" || pathname === "/signup")) {
     return redirect("/dashboard");
   }
 

@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Before responding, check if any of the following skills in .claude/skills/ is relevant to this request: add-protected-page, add-server-action, modify-db-schema, run-write-tests. If a skill matches, invoke it with /skill-name. If no skill applies, proceed normally.'"
+          }
+        ]
+      }
+    ]
+  }
+}

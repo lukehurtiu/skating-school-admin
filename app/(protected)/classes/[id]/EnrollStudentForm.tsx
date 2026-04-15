@@ -25,16 +25,12 @@ export default function EnrollStudentForm({ classId, availableStudents }: Props)
   }
 
   if (availableStudents.length === 0) {
-    return <p className="text-sm text-gray-500">All students are enrolled in this class.</p>;
+    return <p className="text-sm text-slate-500">All students are enrolled in this class.</p>;
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex items-center gap-3">
-      <select
-        name="student_id"
-        required
-        className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-      >
+      <select name="student_id" required className="input max-w-xs">
         <option value="">Select a student…</option>
         {availableStudents.map((s) => (
           <option key={s.id} value={s.id}>
@@ -42,14 +38,10 @@ export default function EnrollStudentForm({ classId, availableStudents }: Props)
           </option>
         ))}
       </select>
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-      >
+      <button type="submit" disabled={isPending} className="btn-primary">
         {isPending ? "Enrolling…" : "Enroll"}
       </button>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="form-error">{error}</p>}
     </form>
   );
 }

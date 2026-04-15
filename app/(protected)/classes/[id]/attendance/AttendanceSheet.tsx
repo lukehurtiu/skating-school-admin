@@ -32,54 +32,50 @@ export default function AttendanceSheet({ classId, date, students }: Props) {
   }
 
   if (students.length === 0) {
-    return <p className="mt-4 text-sm text-gray-500">No students enrolled in this class.</p>;
+    return (
+      <div className="mt-6 rounded-lg border border-slate-200 bg-white px-6 py-10 text-center">
+        <p className="text-sm font-medium text-slate-900">No students enrolled</p>
+        <p className="mt-1 text-sm text-slate-500">Enroll students in this class to take attendance.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="mt-4 overflow-hidden rounded-lg border border-gray-200 bg-white">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+    <div className="mt-4 table-container">
+      <table className="min-w-full divide-y divide-slate-200">
+        <thead className="bg-slate-50">
           <tr>
             {["Student", "Status", "Actions"].map((h) => (
-              <th
-                key={h}
-                className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-              >
-                {h}
-              </th>
+              <th key={h} className="th">{h}</th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-slate-200">
           {students.map((s) => (
-            <tr key={s.studentId} className="hover:bg-gray-50">
-              <td className="px-4 py-3 text-sm font-medium text-gray-900">{s.name}</td>
-              <td className="px-4 py-3 text-sm">
+            <tr key={s.studentId} className="hover:bg-slate-50">
+              <td className="td-primary">{s.name}</td>
+              <td className="td">
                 {s.status === "present" ? (
-                  <span className="inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                    Present
-                  </span>
+                  <span className="badge-green">Present</span>
                 ) : s.status === "absent" ? (
-                  <span className="inline-block rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
-                    Absent
-                  </span>
+                  <span className="badge-red">Absent</span>
                 ) : (
-                  <span className="text-gray-400">—</span>
+                  <span className="text-slate-400">—</span>
                 )}
               </td>
-              <td className="px-4 py-3 text-sm">
+              <td className="td">
                 <div className="flex gap-2">
                   <button
                     disabled={isPending || s.status === "present"}
                     onClick={() => handleMark(s.enrollmentId, s.studentId, "present")}
-                    className="rounded-md bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-40"
+                    className="btn-sm rounded-md bg-green-600 font-medium text-white transition-colors hover:bg-green-700 disabled:opacity-40"
                   >
                     Present
                   </button>
                   <button
                     disabled={isPending || s.status === "absent"}
                     onClick={() => handleMark(s.enrollmentId, s.studentId, "absent")}
-                    className="rounded-md bg-red-500 px-3 py-1 text-xs font-medium text-white hover:bg-red-600 disabled:opacity-40"
+                    className="btn-sm rounded-md bg-red-500 font-medium text-white transition-colors hover:bg-red-600 disabled:opacity-40"
                   >
                     Absent
                   </button>

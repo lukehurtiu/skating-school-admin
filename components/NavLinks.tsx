@@ -3,14 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const links = [
+const staffLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/classes", label: "Classes" },
   { href: "/students", label: "Students" },
+  { href: "/skills", label: "Skills" },
 ];
 
-export default function NavLinks() {
+const guardianLinks = [
+  { href: "/my-students", label: "My Students" },
+];
+
+export default function NavLinks({ role }: { role: string }) {
   const pathname = usePathname();
+  const links = role === "guardian" ? guardianLinks : staffLinks;
 
   return (
     <nav className="flex items-center gap-6">
@@ -22,8 +28,8 @@ export default function NavLinks() {
             href={href}
             className={
               isActive
-                ? "text-sm font-semibold text-blue-600"
-                : "text-sm text-gray-600 hover:text-gray-900"
+                ? "text-sm font-semibold text-indigo-600"
+                : "text-sm text-slate-600 hover:text-slate-900"
             }
           >
             {label}

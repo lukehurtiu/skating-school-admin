@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import CreateStudentForm from "./CreateStudentForm";
+import { SkatingLevel } from "@/lib/types";
 
 export default async function NewStudentPage() {
   const supabase = createClient();
@@ -18,10 +20,18 @@ export default async function NewStudentPage() {
 
   if (profile?.role !== "admin") redirect("/students");
 
+  const { data: levels } = await supabase
+    .from("skating_levels")
+    .select("*")
+    .order("sort_order")
+    .returns<SkatingLevel[]>();
+
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900">New Student</h1>
-      <CreateStudentForm />
+      <Link href="/students" className="back-link">← Back to students</Link>
+      <h1 className="mt-4 page-title">New Student</h1>
+      <p className="page-subtitle">Add a new student to the program.</p>
+      <CreateStudentForm levels={levels ?? []} />
     </div>
   );
 }

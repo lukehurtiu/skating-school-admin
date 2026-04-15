@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import LoginForm from "./LoginForm";
 
 export default function LoginPage() {
@@ -26,6 +27,12 @@ export default function LoginPage() {
       {/* Form */}
       <div className="mt-8 w-full max-w-sm">
         <LoginForm />
+        <p className="mt-4 text-center text-xs text-slate-400">
+          Are you a parent?{" "}
+          <Link href="/signup" className="font-medium text-slate-600 hover:text-slate-900 transition-colors">
+            Create a parent account
+          </Link>
+        </p>
       </div>
     </main>
   );

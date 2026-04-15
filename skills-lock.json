@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "agent-config-migrate": {
+      "source": "lukethebuilder/skills",
+      "sourceType": "github",
+      "computedHash": "dce25c3b945b3dda50e7e24ff5f661ecb1ebe0af0c98456ca191943270a99c03"
+    }
+  }
+}

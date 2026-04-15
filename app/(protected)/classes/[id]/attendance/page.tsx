@@ -48,29 +48,27 @@ export default async function AttendancePage({
   const students = (enrollments ?? []).map((e) => ({
     enrollmentId: e.id,
     studentId: e.student_id,
-    name: e.students
-      ? `${e.students.first_name} ${e.students.last_name}`
-      : "Unknown",
+    name: e.students ? `${e.students.first_name} ${e.students.last_name}` : "Unknown",
     status: statusMap.get(e.student_id) ?? null,
   }));
 
   return (
     <div>
-      <Link href={`/classes/${params.id}`} className="text-sm text-blue-600 hover:underline">
+      <Link href={`/classes/${params.id}`} className="back-link">
         ← Back to class
       </Link>
 
-      <h1 className="mt-4 text-2xl font-bold text-gray-900">
-        Attendance — {skatingClass.name}
-      </h1>
-      <p className="mt-1 text-sm text-gray-500">
-        {new Date(today + "T00:00:00").toLocaleDateString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
-      </p>
+      <div className="mt-4">
+        <h1 className="page-title">Attendance — {skatingClass.name}</h1>
+        <p className="page-subtitle">
+          {new Date(today + "T00:00:00").toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </p>
+      </div>
 
       <AttendanceSheet classId={params.id} date={today} students={students} />
     </div>
