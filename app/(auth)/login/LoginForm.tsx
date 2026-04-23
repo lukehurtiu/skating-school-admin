@@ -6,11 +6,6 @@ import { signIn, signUp } from "./actions";
 
 type Mode = "signin" | "signup";
 
-const inputClass =
-  "mt-1 block w-full rounded border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-300 transition-colors focus:border-slate-400 focus:outline-none";
-
-const labelClass = "block text-[11px] font-semibold uppercase tracking-wide text-slate-400";
-
 export default function LoginForm() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("signin");
@@ -48,17 +43,14 @@ export default function LoginForm() {
 
   if (confirmed) {
     return (
-      <div className="w-full rounded-lg border border-slate-200 bg-white p-8">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-          Account created
-        </p>
-        <h2 className="mt-2 text-base font-semibold text-slate-900">Check your email</h2>
-        <p className="mt-2 text-sm leading-relaxed text-slate-500">
+      <div className="card p-8">
+        <h2 className="text-base font-semibold text-text-primary">Check your email</h2>
+        <p className="mt-2 text-sm leading-relaxed text-text-muted">
           We sent a confirmation link to your address. Click it to activate your account, then sign in.
         </p>
         <button
           onClick={() => switchMode("signin")}
-          className="mt-6 text-xs font-semibold uppercase tracking-wide text-slate-500 hover:text-slate-900 transition-colors"
+          className="mt-6 back-link"
         >
           ← Back to sign in
         </button>
@@ -67,22 +59,20 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="w-full rounded-lg border border-slate-200 bg-white p-8">
-      {/* Header */}
-      <h1 className="text-[15px] font-semibold text-slate-900">
-        {mode === "signin" ? "Sign in to your account" : "Create your account"}
-      </h1>
-      <p className="mt-1 text-[13px] text-slate-400">
+    <div className="card p-8">
+      <h2 className="text-lg font-semibold text-text-primary">
+        {mode === "signin" ? "Sign in" : "Create your account"}
+      </h2>
+      <p className="mt-1 text-sm text-text-muted">
         {mode === "signin"
           ? "Enter your credentials to continue."
           : "New instructors start here."}
       </p>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         {mode === "signup" && (
           <div>
-            <label htmlFor="full_name" className={labelClass}>
+            <label htmlFor="full_name" className="label">
               Full name
             </label>
             <input
@@ -91,14 +81,14 @@ export default function LoginForm() {
               type="text"
               required
               autoComplete="name"
-              className={inputClass}
+              className="input"
             />
           </div>
         )}
 
         <div>
-          <label htmlFor="email" className={labelClass}>
-            Email
+          <label htmlFor="email" className="label">
+            Email address
           </label>
           <input
             id="email"
@@ -106,12 +96,12 @@ export default function LoginForm() {
             type="email"
             required
             autoComplete="email"
-            className={inputClass}
+            className="input"
           />
         </div>
 
         <div>
-          <label htmlFor="password" className={labelClass}>
+          <label htmlFor="password" className="label">
             Password
           </label>
           <input
@@ -121,23 +111,19 @@ export default function LoginForm() {
             required
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
             minLength={mode === "signup" ? 6 : undefined}
-            className={inputClass}
+            className="input"
           />
           {mode === "signup" && (
-            <p className="mt-1 text-xs text-slate-400">Minimum 6 characters.</p>
+            <p className="mt-1 text-xs text-text-muted">Minimum 6 characters.</p>
           )}
         </div>
 
-        {error && (
-          <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600">
-            {error}
-          </p>
-        )}
+        {error && <p className="form-error">{error}</p>}
 
         <button
           type="submit"
           disabled={isPending}
-          className="mt-2 w-full rounded bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:opacity-40"
+          className="btn-primary w-full justify-center py-2.5 mt-2"
         >
           {isPending
             ? mode === "signin" ? "Signing in…" : "Creating account…"
@@ -145,15 +131,14 @@ export default function LoginForm() {
         </button>
       </form>
 
-      {/* Mode toggle */}
-      <p className="mt-6 border-t border-slate-100 pt-5 text-xs text-slate-400">
+      <p className="mt-6 border-t border-slate-100 pt-5 text-xs text-text-muted">
         {mode === "signin" ? (
           <>
             Don&apos;t have an account?{" "}
             <button
               type="button"
               onClick={() => switchMode("signup")}
-              className="font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              className="font-medium text-ice-600 hover:underline transition-colors"
             >
               Sign up
             </button>
@@ -164,7 +149,7 @@ export default function LoginForm() {
             <button
               type="button"
               onClick={() => switchMode("signin")}
-              className="font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              className="font-medium text-ice-600 hover:underline transition-colors"
             >
               Sign in
             </button>

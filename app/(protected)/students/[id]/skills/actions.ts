@@ -68,3 +68,65 @@ export async function submitAssessment(formData: FormData) {
 
   revalidatePath(`/students/${student_id}/skills`);
 }
+
+export async function recommendLevel(formData: FormData) {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile) return { error: "Unauthorized" };
+
+  const student_id = formData.get("student_id") as string;
+  const class_id = formData.get("class_id") as string;
+  const recommended_level_id = formData.get("recommended_level_id") as string;
+  const comment = (formData.get("comment") as string) ?? "";
+  const assessed_on = formData.get("assessed_on") as string;
+
+  if (!student_id || !class_id || !recommended_level_id || !assessed_on) {
+    return { error: "Missing required fields" };
+  }
+
+  if (profile.role !== "admin") {
+    const { data: classRow } = await supabase
+      .from("classes")
+      .select("instructor_id")
+      .eq("id", class_id)
+      .single();
+
+    const { data: classInstructorRow } = await supabase
+      .from("class_instructors")
+      .select("id")
+      .eq("class_id", class_id)
+      .eq("instructor_id", user.id)
+      .maybeSingle();
+
+    const isOwnClass =
+      classRow?.instructor_id === user.id || !!classInstructorRow;
+
+    if (!isOwnClass) return { error: "Unauthorized" };
+  }
+
+  const { error } = await supabase
+    .from("level_advancement_recommendations")
+    .insert({
+      student_id,
+      class_id,
+      instructor_id: user.id,
+      recommended_level_id,
+      comment,
+      assessed_on,
+    });
+
+  if (error) return { error: "Failed to save recommendation" };
+
+  revalidatePath(`/students/${student_id}/skills`);
+}

@@ -2,61 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply bg-surface text-text-primary font-sans;
+  }
+}
+
 @layer components {
   /* ── Buttons ────────────────────────────────────────── */
   .btn-primary {
-    @apply rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50;
+    @apply inline-flex items-center justify-center rounded-btn bg-ice-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ice-600 disabled:opacity-50 min-h-[36px];
   }
   .btn-secondary {
-    @apply rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50;
+    @apply inline-flex items-center justify-center rounded-btn border border-[#d0d7de] bg-white px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-surface disabled:opacity-50 min-h-[36px];
   }
   .btn-danger {
-    @apply rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50;
+    @apply inline-flex items-center justify-center rounded-btn bg-danger px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50 min-h-[36px];
   }
   .btn-ghost {
-    @apply text-sm text-slate-500 transition-colors hover:text-slate-900;
+    @apply text-sm text-text-muted transition-colors hover:text-text-primary;
   }
   .btn-sm {
-    @apply px-3 py-1.5 text-xs;
+    @apply px-3 py-1.5 text-xs min-h-[30px];
+  }
+  .btn-icon {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded-btn transition-colors hover:bg-surface text-text-muted hover:text-text-primary;
+  }
+  .btn-icon-danger {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded-btn transition-colors hover:bg-red-50 text-text-muted hover:text-danger;
   }
 
   /* ── Form inputs ─────────────────────────────────────── */
   .input {
-    @apply mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500;
+    @apply mt-1 block w-full rounded-btn border border-[#d0d7de] bg-white px-3 py-2 text-sm text-text-primary placeholder-text-muted transition-colors focus:border-ice-500 focus:outline-none focus:ring-1 focus:ring-ice-500;
   }
   .label {
-    @apply block text-sm font-medium text-slate-700;
+    @apply block text-sm font-medium text-text-primary;
   }
   .label-xs {
-    @apply block text-[11px] font-semibold uppercase tracking-wide text-slate-400;
+    @apply block text-[11px] font-semibold uppercase tracking-wide text-text-muted;
   }
 
   /* ── Badges ──────────────────────────────────────────── */
   .badge {
-    @apply inline-block rounded-full px-2.5 py-0.5 text-xs font-medium;
+    @apply inline-block rounded-pill px-2.5 py-0.5 text-xs font-medium;
   }
   .badge-gray     { @apply badge bg-slate-100 text-slate-600; }
-  .badge-indigo   { @apply badge bg-indigo-50 text-indigo-700; }
+  .badge-ice      { @apply badge bg-ice-50 text-ice-700; }
+  .badge-indigo   { @apply badge bg-ice-50 text-ice-700; }
   .badge-green    { @apply badge bg-green-50 text-green-700; }
   .badge-yellow   { @apply badge bg-yellow-50 text-yellow-700; }
   .badge-red      { @apply badge bg-red-50 text-red-700; }
-  .badge-admin    { @apply badge bg-indigo-600 font-semibold text-white; }
+  .badge-admin    { @apply badge bg-ice-600 font-semibold text-white; }
   .badge-instructor { @apply badge bg-slate-200 font-semibold text-slate-700; }
+  .badge-student  { @apply badge bg-green-50 font-semibold text-green-700; }
+
+  /* ── Level badges ────────────────────────────────────── */
+  .level-parent-tot { @apply badge bg-slate-100 text-slate-700; }
+  .level-tot-2      { @apply badge bg-blue-50 text-blue-700; }
+  .level-1          { @apply badge bg-green-50 text-green-700; }
+  .level-2          { @apply badge bg-yellow-50 text-yellow-800; }
+  .level-3          { @apply badge bg-orange-50 text-orange-700; }
+  .level-4          { @apply badge bg-red-50 text-red-700; }
+  .level-5          { @apply badge bg-purple-50 text-purple-700; }
+  .level-pre-free   { @apply badge bg-pink-50 text-pink-700; }
+  .level-default    { @apply badge bg-slate-100 text-slate-600; }
 
   /* ── Tables ──────────────────────────────────────────── */
   .table-container {
-    @apply overflow-hidden rounded-lg border border-slate-200 bg-white;
+    @apply overflow-hidden rounded-card shadow-card bg-white;
   }
   .th {
-    @apply px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500;
+    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-text-muted;
   }
-  .td          { @apply px-4 py-3 text-sm text-slate-600; }
-  .td-primary  { @apply px-4 py-3 text-sm font-medium text-slate-900; }
+  .td          { @apply px-4 py-3 text-sm text-text-muted; }
+  .td-primary  { @apply px-4 py-3 text-sm font-medium text-text-primary; }
 
   /* ── Page layout ─────────────────────────────────────── */
   .page-header   { @apply flex items-center justify-between; }
-  .page-title    { @apply text-2xl font-bold text-slate-900; }
-  .page-subtitle { @apply mt-1 text-sm text-slate-500; }
+  .page-title    { @apply text-2xl font-semibold text-text-primary; }
+  .page-subtitle { @apply mt-1 text-sm text-text-muted; }
+  .section-title { @apply text-lg font-semibold text-text-primary; }
 
   /* ── Feedback ────────────────────────────────────────── */
   .form-error {
@@ -67,13 +93,21 @@
   }
 
   /* ── Navigation ──────────────────────────────────────── */
-  .back-link { @apply text-sm text-indigo-600 hover:underline; }
+  .back-link { @apply text-sm text-ice-600 hover:underline; }
 
   /* ── Cards ───────────────────────────────────────────── */
   .card {
-    @apply rounded-lg border border-slate-200 bg-white;
+    @apply rounded-card shadow-card bg-white;
+  }
+  .card-hover {
+    @apply rounded-card shadow-card bg-white transition-shadow hover:shadow-card-hover;
   }
   .card-row {
     @apply flex items-center justify-between border-b border-slate-100 px-4 py-3 last:border-0;
+  }
+
+  /* ── Skeleton loader ─────────────────────────────────── */
+  .skeleton {
+    @apply animate-pulse rounded bg-slate-200;
   }
 }

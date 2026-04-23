@@ -97,3 +97,16 @@ export interface SkillAssessment {
   skills?: Pick<Skill, "name" | "sort_order">;
   profiles?: Pick<Profile, "full_name">;
 }
+
+export interface LevelAdvancementRecommendation {
+  id: string;
+  student_id: string;
+  instructor_id: string;
+  class_id: string;
+  recommended_level_id: string;
+  comment: string;
+  assessed_on: string;
+  created_at: string;
+  skating_levels?: Pick<SkatingLevel, "name">;
+  profiles?: Pick<Profile, "full_name">;
+}

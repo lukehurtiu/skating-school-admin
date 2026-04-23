@@ -127,7 +127,7 @@ export default function SessionSheet({
                   <button
                     disabled={isPending || s.attendanceStatus === "present"}
                     onClick={() => handleAttendance(s.enrollmentId, s.studentId, "present")}
-                    className={`btn-sm rounded-md font-medium text-white transition-colors ${
+                    className={`min-h-[44px] min-w-[44px] rounded-btn px-4 text-sm font-medium text-white transition-colors ${
                       s.attendanceStatus === "present"
                         ? "bg-green-600 opacity-100 cursor-default"
                         : "bg-slate-200 text-slate-600 hover:bg-green-600 hover:text-white disabled:opacity-40"
@@ -138,7 +138,7 @@ export default function SessionSheet({
                   <button
                     disabled={isPending || s.attendanceStatus === "absent"}
                     onClick={() => handleAttendance(s.enrollmentId, s.studentId, "absent")}
-                    className={`btn-sm rounded-md font-medium text-white transition-colors ${
+                    className={`min-h-[44px] min-w-[44px] rounded-btn px-4 text-sm font-medium text-white transition-colors ${
                       s.attendanceStatus === "absent"
                         ? "bg-red-500 opacity-100 cursor-default"
                         : "bg-slate-200 text-slate-600 hover:bg-red-500 hover:text-white disabled:opacity-40"
@@ -150,7 +150,7 @@ export default function SessionSheet({
                   <button
                     type="button"
                     onClick={() => toggleStudent(s.studentId)}
-                    className="text-xs text-indigo-600 hover:underline"
+                    className="min-h-[44px] px-3 text-sm text-ice-600 hover:underline"
                   >
                     {isExpanded ? "Hide skills" : "Skills"}
                   </button>
@@ -179,7 +179,7 @@ export default function SessionSheet({
                                     type="button"
                                     disabled={isPending || current === s_status}
                                     onClick={() => handleAssess(s.studentId, skill.id, s_status)}
-                                    className={`rounded px-2 py-0.5 text-xs font-medium transition-colors disabled:cursor-default ${
+                                    className={`min-h-[44px] rounded-btn px-3 text-xs font-medium transition-colors disabled:cursor-default ${
                                       current === s_status
                                         ? STATUS_BADGE[s_status] + " opacity-100"
                                         : "bg-slate-100 text-slate-500 hover:bg-slate-200 disabled:opacity-60"

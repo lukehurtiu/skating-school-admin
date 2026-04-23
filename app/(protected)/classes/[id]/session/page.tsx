@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { Skill, SkatingLevel, SkillAssessment, AssessmentStatus } from "@/lib/types";
+import { getTodayDateString } from "@/lib/utils";
 import SessionSheet from "./SessionSheet";
 
 type EnrollmentRow = {
@@ -34,7 +35,7 @@ export default async function SessionPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayDateString();
   const sessionDate = searchParams.date ?? today;
 
   const [

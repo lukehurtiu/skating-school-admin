@@ -1,14 +1,31 @@
 import { createClient } from "@/lib/supabase/server";
-import { Student, SkatingLevel, Skill, SkillAssessment, SkatingClass, AssessmentStatus } from "@/lib/types";
+import {
+  Student,
+  SkatingLevel,
+  Skill,
+  SkillAssessment,
+  SkatingClass,
+  AssessmentStatus,
+  LevelAdvancementRecommendation,
+} from "@/lib/types";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import AssessmentForm from "./AssessmentForm";
+import LevelBadge from "@/components/LevelBadge";
+import ProgressBar from "@/components/ProgressBar";
+import AvatarInitials from "@/components/AvatarInitials";
+import SkillsAccordion from "./SkillsAccordion";
+import RecommendLevelModal from "./RecommendLevelModal";
 
 type StudentWithLevel = Student & {
   skating_levels: { name: string } | null;
 };
 
 type LevelWithSkills = SkatingLevel & { skills: Skill[] };
+
+type RecommendationWithJoins = LevelAdvancementRecommendation & {
+  skating_levels: { name: string } | null;
+  profiles: { full_name: string } | null;
+};
 
 export default async function StudentSkillsPage({
   params,
@@ -30,6 +47,7 @@ export default async function StudentSkillsPage({
     { data: assessments },
     { data: primaryClasses },
     { data: secondaryRows },
+    { data: recommendations },
   ] = await Promise.all([
     supabase
       .from("students")
@@ -58,13 +76,19 @@ export default async function StudentSkillsPage({
       .select("classes(id, name)")
       .eq("instructor_id", user!.id)
       .returns<{ classes: Pick<SkatingClass, "id" | "name"> }[]>(),
+    supabase
+      .from("level_advancement_recommendations")
+      .select("*, skating_levels(name), profiles(full_name)")
+      .eq("student_id", params.id)
+      .order("created_at", { ascending: false })
+      .returns<RecommendationWithJoins[]>(),
   ]);
 
   if (!student) notFound();
 
-  const latestBySkill = new Map<string, SkillAssessment>();
+  const latestBySkillRaw = new Map<string, SkillAssessment>();
   for (const a of assessments ?? []) {
-    if (!latestBySkill.has(a.skill_id)) latestBySkill.set(a.skill_id, a);
+    if (!latestBySkillRaw.has(a.skill_id)) latestBySkillRaw.set(a.skill_id, a);
   }
 
   const seen = new Set<string>();
@@ -88,7 +112,19 @@ export default async function StudentSkillsPage({
 
   const totalSkills = levelsWithSortedSkills.reduce((sum, l) => sum + l.skills.length, 0);
   let passedCount = 0;
-  latestBySkill.forEach((a) => { if (a.status === "passed") passedCount++; });
+  latestBySkillRaw.forEach((a) => { if (a.status === "passed") passedCount++; });
+
+  // Serialize map to plain object for client component
+  const latestBySkill: Record<string, { status: AssessmentStatus; assessed_on?: string; comment?: string }> = {};
+  latestBySkillRaw.forEach((a, skillId) => {
+    latestBySkill[skillId] = {
+      status: a.status,
+      assessed_on: a.assessed_on,
+      comment: a.comment ?? undefined,
+    };
+  });
+
+  const latestRecommendation = (recommendations ?? [])[0] ?? null;
 
   return (
     <div>
@@ -98,95 +134,94 @@ export default async function StudentSkillsPage({
         <p className="form-success mt-3">Changes saved successfully.</p>
       )}
 
-      <div className="mt-4 flex items-start justify-between">
-        <div>
-          <h1 className="page-title">{student.first_name} {student.last_name}</h1>
-          <p className="page-subtitle">
-            {student.skating_levels?.name ?? "No level set"} · {passedCount} / {totalSkills} skills passed
-          </p>
+      {/* Page header */}
+      <div className="mt-4 flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <AvatarInitials name={`${student.first_name} ${student.last_name}`} size="md" />
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="page-title">{student.first_name} {student.last_name}</h1>
+              {student.skating_levels?.name && (
+                <LevelBadge levelName={student.skating_levels.name} />
+              )}
+            </div>
+            <p className="page-subtitle mt-0.5">
+              {passedCount} / {totalSkills} skills passed
+            </p>
+          </div>
         </div>
-        {profile?.role === "admin" && (
-          <div className="flex gap-2">
+        <div className="flex items-center gap-2 shrink-0">
+          {canAssess && (
+            <RecommendLevelModal
+              studentId={params.id}
+              levels={(levels ?? []).map((l) => ({ id: l.id, name: l.name }))}
+              instructorClasses={instructorClasses}
+            />
+          )}
+          {profile?.role === "admin" && (
             <Link href={`/students/${params.id}/edit`} className="btn-secondary">Edit</Link>
+          )}
+        </div>
+      </div>
+
+      {/* Overall progress bar */}
+      <div className="mt-4">
+        <ProgressBar current={passedCount} total={totalSkills} size="md" />
+      </div>
+
+      {/* Latest recommendation */}
+      {latestRecommendation && (
+        <div className="mt-5 rounded-card border border-ice-200 bg-ice-50 px-4 py-3">
+          <p className="text-sm font-medium text-ice-900">
+            Recommended for {latestRecommendation.skating_levels?.name}
+            <span className="ml-2 font-normal text-ice-600 text-xs">
+              {latestRecommendation.assessed_on} · by {latestRecommendation.profiles?.full_name}
+            </span>
+          </p>
+          {latestRecommendation.comment && (
+            <p className="mt-1 text-xs italic text-ice-700">&ldquo;{latestRecommendation.comment}&rdquo;</p>
+          )}
+        </div>
+      )}
+
+      {/* Skills accordion */}
+      <div className="mt-6">
+        <h2 className="section-title mb-3">Skills by Level</h2>
+        <SkillsAccordion
+          levels={levelsWithSortedSkills}
+          studentLevelId={student.skating_level_id}
+          latestBySkill={latestBySkill}
+          canAssess={canAssess}
+          instructorClasses={instructorClasses}
+          studentId={params.id}
+        />
+      </div>
+
+      {/* Level history */}
+      <div className="mt-8">
+        <h2 className="section-title mb-3">Level History</h2>
+        {(recommendations ?? []).length === 0 ? (
+          <p className="text-sm text-text-muted">No level recommendations yet.</p>
+        ) : (
+          <div className="card divide-y divide-slate-100">
+            {(recommendations ?? []).map((rec) => (
+              <div key={rec.id} className="card-row">
+                <div>
+                  <p className="text-sm font-medium text-text-primary">
+                    {rec.skating_levels?.name}
+                  </p>
+                  <p className="text-xs text-text-muted mt-0.5">
+                    {rec.assessed_on} · {rec.profiles?.full_name}
+                  </p>
+                  {rec.comment && (
+                    <p className="text-xs italic text-text-muted mt-0.5">&ldquo;{rec.comment}&rdquo;</p>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
-
-      <div className="mt-6 space-y-4">
-        {levelsWithSortedSkills.map((level) => {
-          const levelPassed = level.skills.filter(
-            (s) => latestBySkill.get(s.id)?.status === "passed"
-          ).length;
-
-          return (
-            <div key={level.id} className="card">
-              <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-                <h2 className="font-semibold text-slate-900">{level.name}</h2>
-                <span className="text-xs text-slate-500">
-                  {levelPassed} / {level.skills.length} passed
-                </span>
-              </div>
-
-              <ul className="divide-y divide-slate-100">
-                {level.skills.map((skill, idx) => {
-                  const latest = latestBySkill.get(skill.id);
-                  const currentStatus: AssessmentStatus = latest?.status ?? "not_assessed";
-
-                  return (
-                    <li key={skill.id} className="px-4 py-3">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <p className="text-sm text-slate-900">
-                            <span className="mr-2 text-slate-400">{idx + 1}.</span>
-                            {skill.name}
-                          </p>
-                          {skill.description && (
-                            <p className="mt-0.5 text-xs text-slate-400">{skill.description}</p>
-                          )}
-                          {latest?.comment && (
-                            <p className="mt-1 text-xs italic text-slate-500">&ldquo;{latest.comment}&rdquo;</p>
-                          )}
-                          {latest && (
-                            <p className="mt-0.5 text-xs text-slate-400">
-                              Last assessed {latest.assessed_on}
-                            </p>
-                          )}
-                        </div>
-                        <div className="shrink-0">
-                          {canAssess ? (
-                            <AssessmentForm
-                              studentId={params.id}
-                              skillId={skill.id}
-                              currentStatus={currentStatus}
-                              instructorClasses={instructorClasses}
-                            />
-                          ) : (
-                            <StatusBadge status={currentStatus} />
-                          )}
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          );
-        })}
-      </div>
     </div>
   );
-}
-
-function StatusBadge({ status }: { status: AssessmentStatus }) {
-  const cls: Record<AssessmentStatus, string> = {
-    not_assessed: "badge-gray",
-    in_progress: "badge-yellow",
-    passed: "badge-green",
-  };
-  const labels: Record<AssessmentStatus, string> = {
-    not_assessed: "Not assessed",
-    in_progress: "In progress",
-    passed: "Passed",
-  };
-  return <span className={cls[status]}>{labels[status]}</span>;
 }

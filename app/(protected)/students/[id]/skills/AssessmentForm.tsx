@@ -11,17 +11,6 @@ type Props = {
   instructorClasses: Pick<SkatingClass, "id" | "name">[];
 };
 
-const STATUS_LABELS: Record<AssessmentStatus, string> = {
-  not_assessed: "Not assessed",
-  in_progress: "In progress",
-  passed: "Passed",
-};
-
-const STATUS_BADGE: Record<AssessmentStatus, string> = {
-  not_assessed: "badge-gray",
-  in_progress: "badge-yellow",
-  passed: "badge-green",
-};
 
 export default function AssessmentForm({
   studentId,
@@ -33,7 +22,7 @@ export default function AssessmentForm({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleDateString("en-CA");
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,11 +38,10 @@ export default function AssessmentForm({
   return (
     <div>
       <div className="flex items-center gap-2">
-        <span className={STATUS_BADGE[currentStatus]}>{STATUS_LABELS[currentStatus]}</span>
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="text-xs text-indigo-600 hover:underline"
+          className="btn-secondary btn-sm min-h-[44px] px-3"
         >
           {open ? "Cancel" : "Assess"}
         </button>

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getTodayDateString } from "@/lib/utils";
 import AttendanceSheet from "./AttendanceSheet";
 
 type EnrollmentRow = {
@@ -21,7 +22,7 @@ export default async function AttendancePage({
 }) {
   const supabase = createClient();
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayDateString();
 
   const [{ data: skatingClass }, { data: enrollments }, { data: attendanceRecords }] =
     await Promise.all([

@@ -416,3 +416,39 @@ insert into skills (name, description, level_id, sort_order) values
   ('Backward stroking (width of rink)',                         '', (select id from skating_levels where name = 'Level 5'), 6),
   ('Two-foot spin',                                             '', (select id from skating_levels where name = 'Level 5'), 7)
 on conflict do nothing;
+
+-- ============================================================
+-- LEVEL ADVANCEMENT RECOMMENDATIONS
+-- Instructor's end-of-session judgment on what level a student
+-- should move to next. History is preserved; most recent = current.
+-- ============================================================
+create table level_advancement_recommendations (
+  id                   uuid primary key default gen_random_uuid(),
+  student_id           uuid not null references students(id) on delete cascade,
+  instructor_id        uuid not null references profiles(id) on delete restrict,
+  class_id             uuid not null references classes(id) on delete cascade,
+  recommended_level_id uuid not null references skating_levels(id) on delete restrict,
+  comment              text not null default '',
+  assessed_on          date not null default current_date,
+  created_at           timestamptz not null default now()
+);
+
+alter table level_advancement_recommendations enable row level security;
+
+create policy "lar: all authenticated can read" on level_advancement_recommendations
+  for select using (auth.role() = 'authenticated');
+
+create policy "lar: instructor write" on level_advancement_recommendations
+  for insert with check (
+    instructor_id = auth.uid()
+    and (
+      exists (select 1 from classes c where c.id = class_id and c.instructor_id = auth.uid())
+      or exists (select 1 from class_instructors ci where ci.class_id = class_id and ci.instructor_id = auth.uid())
+      or exists (select 1 from profiles p where p.id = auth.uid() and p.role = 'admin')
+    )
+  );
+
+create policy "lar: admin full write" on level_advancement_recommendations
+  for all using (
+    exists (select 1 from profiles p where p.id = auth.uid() and p.role = 'admin')
+  );
